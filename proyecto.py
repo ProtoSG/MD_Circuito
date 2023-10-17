@@ -5,7 +5,7 @@ import re
 def main(page: ft.Page):
     page.title = "Simulador de Circuitos"
     page.theme_mode = ft.ThemeMode.LIGHT
-
+    page.window_height = 850
     alert = ft.AlertDialog(
         title=ft.Text("Valores Erroneos", color="red"),
         content= ft.Text("Los valores ingresados no son válid   os\nUtilizar 0 y 1"),
@@ -19,7 +19,7 @@ def main(page: ft.Page):
     
    
     def agregarSalida(e):
-        salidaStr = list(tb.value)
+        salidaStr = list(text_field.value)
         salida = []
         for valor in salidaStr:
             if valor != '0' and valor != '1':
@@ -27,6 +27,20 @@ def main(page: ft.Page):
             salida.append(int(valor))
         return salida
     
+    def button_zero_action(e):
+        if(len(text_field.value) <=15):
+            text_field.value += "0"
+        page.update()
+
+    def button_one_action(e):
+        if(len(text_field.value) <=15):
+            text_field.value += "1"
+        page.update()
+
+    def button_erase_action(e):
+        text_field.value = text_field.value[:-1]
+        page.update()
+
     def digitsFormat(x):
         digit = 0
         if x:
@@ -37,7 +51,6 @@ def main(page: ft.Page):
     def mostrarSalida(e):
         mat.clear()
         salida = agregarSalida(e)
-        indice = 0
         lv.controls.append(ft.Text(f"a   b   c   d  |  s"))
         lv.controls.append(ft.Text(f"-----------------"))
         for a, b, c, d in product((True, False), repeat=4):
@@ -96,24 +109,8 @@ def main(page: ft.Page):
 
     #Traduciendo la cadena a valores booleanos
     
-    
-    def stringToBoolean(sumandos):
-        allExpresion = []
-        for sumando in sumandos:
-            parcial = []
-            for factor in sumando:
-                if factor.isupper():
-                    aux = False
-                else:
-                    aux = True
-                parcial.append(aux)
-            allExpresion.append(parcial)
-        return allExpresion
-    
-    # booleanAllExpresion = stringToBoolean(sumandos)
-    
     def agregarCodigo(e):
-        codigoText = list(codigoTxt.value)
+        codigoText = list(text_field2.value)
         codigo = []
         for valor in codigoText:
             if valor != '0' and valor != '1':
@@ -121,6 +118,20 @@ def main(page: ft.Page):
             codigo.append(int(valor))
         return codigo
     
+    def button_zero_action2(e):
+        if(len(text_field2.value) <=3):
+            text_field2.value += "0"
+        page.update()
+
+    def button_one_action2(e):
+        if(len(text_field2.value) <=3):
+            text_field2.value += "1"
+        page.update()
+
+    def button_erase_action2(e):
+        text_field2.value = text_field2.value[:-1]
+        page.update()
+
     def digitToBooleanValue(codigo):
         booleanValue = []
         for i in codigo:
@@ -177,15 +188,21 @@ def main(page: ft.Page):
     formulaGeneralTxt = ft.Text()
     comprobarTxt = ft.Text()
     codigoTraducido = ft.Text()
-    tb = ft.TextField(label="Salida")
-    codigoTxt = ft.TextField(label="Codigo")
+    text_field = ft.TextField(value="", label="Salida-[0101010101]", read_only=True)
+    text_field2 = ft.TextField(value="", label="Codigo-[0101]", read_only=True)
 
-    boton = ft.ElevatedButton(text="Enviar", on_click=agregarSalida)
+
     boton2 = ft.ElevatedButton(text="Generar Salida", on_click=mostrarSalida)
     enviar2 = ft.ElevatedButton(text="Enviar", on_click=agregarCodigo)
     botonFormula = ft.ElevatedButton(text="Mostrar Fórmula", on_click=mostrarFormula)
     botonComprobar = ft.ElevatedButton(text="Comprobar", on_click=mostrarComprobar)
     botonMostrarCodigoTraducido = ft.ElevatedButton(text="Codigo Traducido", on_click=mostrarCodigoTraducido)
+    button_erase = ft.ElevatedButton(text="Borrar", on_click=button_erase_action)
+    button_zero = ft.ElevatedButton(text="0", on_click=button_zero_action)
+    button_one = ft.ElevatedButton(text="1", on_click=button_one_action)
+    button_erase2 = ft.ElevatedButton(text="Borrar", on_click=button_erase_action2)
+    button_zero2 = ft.ElevatedButton(text="0", on_click=button_zero_action2)
+    button_one2 = ft.ElevatedButton(text="1", on_click=button_one_action2)
     lv = ft.ListView(expand=1, spacing=10, auto_scroll=True)
 
     foco = ft.Container(
@@ -212,7 +229,20 @@ def main(page: ft.Page):
                         [ 
                             ft.Row(
                                 [
-                                    tb, boton
+                                    text_field, 
+                                    ft.Column(
+                                        [
+                                            ft.Row(
+                                                [
+                                                    button_zero, button_one
+                                                ]
+                                            ),
+                                            ft.Container(
+                                                button_erase
+                                            )
+                                        ],
+                                        horizontal_alignment=ft.CrossAxisAlignment.CENTER         
+                                    )
                                 ],
                                 alignment=ft.MainAxisAlignment.SPACE_EVENLY
                             ),
@@ -228,7 +258,19 @@ def main(page: ft.Page):
                                 border_radius=10,
                                 margin=ft.margin.symmetric(vertical=20, horizontal=40),
                                 alignment=ft.alignment.center
-                            ),
+                            )
+                        ]
+                    ),
+                    bgcolor=ft.colors.GREY,
+                    border_radius=20,
+                    width=500,
+                    height=790,
+                    padding=ft.padding.symmetric(vertical=30),
+                    alignment=ft.alignment.center
+                ),
+                ft.Container(
+                    ft.Column(
+                        [
                             ft.Container(
                                 ft.Column(
                                     [
@@ -237,24 +279,25 @@ def main(page: ft.Page):
                                 ),
                                 margin=ft.margin.symmetric(vertical=20, horizontal=40),
                                 alignment=ft.alignment.center_left
-                            )
-                        ]
-                    ),
-                    bgcolor=ft.colors.GREY,
-                    border_radius=20,
-                    width=500,
-                    height=1000,
-                    padding=ft.padding.symmetric(vertical=30),
-                    alignment=ft.alignment.center
-                ),
-                ft.Container(
-                    ft.Column(
-                        [
+                            ),
                             ft.Row(
                                 [
-                                    codigoTxt, enviar2 
+                                    text_field2, 
+                                    ft.Column(
+                                        [
+                                            ft.Row(
+                                                [
+                                                    button_zero2, button_one2
+                                                ]
+                                            ),
+                                            ft.Container(
+                                                button_erase2
+                                            )
+                                        ],
+                                        horizontal_alignment=ft.CrossAxisAlignment.CENTER         
+                                    )
                                 ],
-                                alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                                alignment=ft.MainAxisAlignment.SPACE_EVENLY
                             ),
                             ft.Container(
                                 ft.Column(
@@ -291,7 +334,7 @@ def main(page: ft.Page):
                     bgcolor=ft.colors.GREY,
                     border_radius=20,
                     width=500,
-                    height=1000,
+                    height=790,
                     padding=ft.padding.symmetric(vertical=30, horizontal=30),
                     margin=ft.margin.symmetric(horizontal=20),
                     alignment=ft.alignment.center
